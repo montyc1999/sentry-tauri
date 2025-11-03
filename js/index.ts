@@ -1,4 +1,4 @@
-import { type BrowserOptions, createTransport } from '@sentry/browser';
+import { type BrowserOptions, createTransport, captureConsoleIntegration } from '@sentry/browser';
 import { invoke } from '@tauri-apps/api/core';
 import type {
   BaseTransportOptions,
@@ -66,7 +66,10 @@ export const defaultOptions: BrowserOptions = {
   // We don't send from the browser but a DSN is required for the SDK to start
   dsn: 'https://123456@dummy.dsn/0',
   // We want to track app sessions rather than browser sessions
-  integrations: (integrations) => integrations.filter((i) => i.name !== 'BrowserSession'),
+  // integrations: (integrations) => integrations.filter((i) => i.name !== 'BrowserSession'),
+  integrations: (integrations) => integrations
+    .filter((i) => i.name !== 'BrowserSession')
+    .concat([captureConsoleIntegration({ levels: ['error', 'warn', 'assert'] })]),
   transport: makeRendererTransport,
   beforeBreadcrumb: sendBreadcrumbToRust,
 };
